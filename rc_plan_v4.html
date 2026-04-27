@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;font-size:12px;padding:12px;background:#fff;color:#1C1A17}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.sc{background:#F5F0E8;border-radius:8px;padding:10px;text-align:center}
+.sc .val{font-size:17px;font-weight:700;color:#1C1A17}
+.sc .lbl{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;border-bottom:1px solid #eee;padding-bottom:8px}
+.tab{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid #ddd;background:#fff;color:#666}
+.tab.active{background:#2E2B26;color:#fff;border-color:#2E2B26}
+.section{display:none}
+.section.active{display:block}
+.section-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#666;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #eee}
+.insight{background:#F5F0E8;border-left:3px solid #C9A84C;padding:8px 12px;margin-bottom:10px;font-size:11px;color:#555;line-height:1.6;border-radius:0 6px 6px 0}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 7px;text-align:left;color:#666;border-bottom:1px solid #eee;background:#fafafa}
+td{padding:6px 7px;vertical-align:top;border-bottom:1px solid #f0f0f0;line-height:1.5;color:#1C1A17}
+tr:hover td{background:#fafafa}
+.total-row td{font-weight:700;background:#F5F0E8}
+.b{display:inline-block;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;white-space:nowrap}
+.peak{background:#E1F5EE;color:#0F6E56}
+.maint{background:#FAEEDA;color:#633806}
+.launch{background:#E6F1FB;color:#0C447C}
+.boost{background:#d4edda;color:#155724;font-weight:700}
+.ig{background:#FAEEDA;color:#633806}
+.li{background:#E6F1FB;color:#0C447C}
+.co{background:#F1EFE8;color:#444}
+.em{background:#EEEDFE;color:#3C3489}
+.changed{color:#0F6E56;font-weight:600}
+.muted{color:#888;font-size:10px;line-height:1.4}
+.bar-wrap{width:100%;background:#eee;border-radius:4px;height:7px;overflow:hidden;margin-top:3px}
+.bar{height:7px;border-radius:4px}
+.bar-pk{background:#4A4A35}
+.bar-mn{background:#C8B99A}
+.bar-ln{background:#0C447C}
+.card{background:#fff;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.card.pk{border-left:3px solid #4A4A35}
+.card.mn{border-left:3px solid #C8B99A}
+.card.ln{border-left:3px solid #0C447C}
+.card-title{font-size:13px;font-weight:700;color:#1C1A17;margin-bottom:2px}
+.card-sub{font-size:10px;color:#888;margin-bottom:7px}
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:6px}
+.ci{text-align:center;padding:5px 3px;background:#fafafa;border-radius:5px;border:1px solid #eee}
+.ci .cn{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.03em;margin-bottom:1px}
+.ci .ca{font-size:12px;font-weight:700;color:#1C1A17}
+.ci .cs{font-size:9px;color:#888}
+.tbadge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:5px}
+.grp{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#888;margin:10px 0 5px;padding-bottom:3px;border-bottom:1px solid #eee}
+.wk-pk td{background:rgba(74,74,53,.04)}
+.wk-mn td{background:rgba(200,185,154,.1)}
+</style>
+</head>
+<body>
+
+<div class="summary">
+  <div class="sc"><div class="val">€8,100</div><div class="lbl">Total 9 months</div></div>
+  <div class="sc"><div class="val">€25/day</div><div class="lbl">All boost rate</div></div>
+  <div class="sc"><div class="val" style="color:#0F6E56">39%</div><div class="lbl">Collabs of budget</div></div>
+  <div class="sc"><div class="val">Apr 27</div><div class="lbl">Start date</div></div>
+</div>
+
+<div class="tabs">
+  <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;padding:5px 4px">BUDGET</span>
+  <button class="tab active" onclick="show(this,'overview')">Season overview</button>
+  <button class="tab" onclick="show(this,'bymonth')">Budget by month</button>
+  <button class="tab" onclick="show(this,'heavy')">Peak months</button>
+  <button class="tab" onclick="show(this,'maint')">Maintenance months</button>
+  <button class="tab" onclick="show(this,'channels')">Channel breakdown</button>
+  <span style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#aaa;padding:5px 8px">CALENDAR</span>
+  <button class="tab" onclick="show(this,'cal1')">Apr–Jun</button>
+  <button class="tab" onclick="show(this,'cal2')">Jul–Sep</button>
+  <button class="tab" onclick="show(this,'cal3')">Oct–Jan</button>
+</div>
+
+<!-- SEASON OVERVIEW -->
+<div id="overview" class="section active">
+  <div class="section-title">Season overview — April 27 to January 2027</div>
+  <div class="insight"><strong>What changed in v3:</strong> Substack paid = €0 (organic + free exchanges only). Collabs elevated to 39% of budget — enough for 2 micro + 1–2 nano influencer posts per peak month. All boosts at €25/day consistent rate.</div>
+  <table>
+    <thead><tr><th>Period</th><th>Months</th><th>Type</th><th>Budget</th><th>Collabs/mo</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Launch</strong></td><td>Apr 27–30</td><td><span class="b launch">Launch</span></td><td><strong>€100</strong></td><td>€0</td><td>IG boost only · 4 days · €25/day · setup week</td></tr>
+      <tr class="wk-pk"><td><strong>Spring peak</strong></td><td>May · Jun</td><td><span class="b peak">Peak</span></td><td><strong>€1,200/mo</strong></td><td class="changed">€500/mo</td><td>2 micro (€150–200) + 2 nano (€50–75) · highest career change intent</td></tr>
+      <tr class="wk-mn"><td><strong>Summer low</strong></td><td>Jul · Aug</td><td><span class="b maint">Maintenance</span></td><td><strong>€550/mo</strong></td><td class="changed">€250/mo</td><td>1 micro + 1 nano · content production months · never zero</td></tr>
+      <tr class="wk-pk"><td><strong>Autumn peak</strong></td><td>Sep · Oct · Nov</td><td><span class="b peak">Peak</span></td><td><strong>€1,100/mo</strong></td><td class="changed">€450/mo</td><td>2 micro + 1–2 nano + founder endorsements P3</td></tr>
+      <tr class="wk-mn"><td><strong>Holiday low</strong></td><td>Dec · Jan W1–2</td><td><span class="b maint">Maintenance</span></td><td><strong>€500/mo</strong></td><td class="changed">€200/mo</td><td>1 micro · talent collabs only · founders offline</td></tr>
+      <tr class="wk-pk"><td><strong>New year burst</strong></td><td>Jan W3–4</td><td><span class="b peak">Peak</span></td><td><strong>€600</strong></td><td class="changed">€200</td><td>1 micro career change hook · timed to new year surge</td></tr>
+      <tr class="total-row"><td colspan="3">Total</td><td>€8,100</td><td class="changed">~€1,800 collabs</td><td>39% of total · Substack = €0 paid throughout</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- BUDGET BY MONTH -->
+<div id="bymonth" class="section">
+  <div class="section-title">Budget by month</div>
+  <div class="insight">4 channels only. Substack promoted via IG Story boosts (inside Instagram budget) and free newsletter exchanges. No separate Substack line.</div>
+  <table>
+    <thead><tr><th>Month</th><th>Type</th><th>Total</th><th>Instagram</th><th>LinkedIn</th><th>Collabs</th><th>Bar</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Late Apr</strong><div class="muted">Apr 27–30</div></td><td><span class="b launch">Launch</span></td><td><strong>€100</strong></td><td>€100<div class="muted">1 boost · 4 days</div></td><td>€0</td><td>€0<div class="muted">Setup only</div></td><td><div class="bar-wrap"><div class="bar bar-ln" style="width:9%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>May</strong></td><td><span class="b peak">Peak</span></td><td><strong>€1,200</strong></td><td>€450<div class="muted">4 boosts</div></td><td>€250<div class="muted">2 boosts</div></td><td class="changed">€500<div class="muted">2 micro + 2 nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:100%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>June</strong></td><td><span class="b peak">Peak</span></td><td><strong>€1,100</strong></td><td>€400<div class="muted">3–4 boosts</div></td><td>€250<div class="muted">2 boosts</div></td><td class="changed">€450<div class="muted">2 micro + 1 nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:92%"></div></div></td></tr>
+      <tr class="wk-mn"><td><strong>July</strong></td><td><span class="b maint">Maintenance</span></td><td><strong>€550</strong></td><td>€200<div class="muted">2 boosts</div></td><td>€100<div class="muted">organic</div></td><td class="changed">€250<div class="muted">1 micro + 1 nano</div></td><td><div class="bar-wrap"><div class="bar bar-mn" style="width:46%"></div></div></td></tr>
+      <tr class="wk-mn"><td><strong>August</strong></td><td><span class="b maint">Maintenance</span></td><td><strong>€550</strong></td><td>€200<div class="muted">2 boosts</div></td><td>€100<div class="muted">organic</div></td><td class="changed">€250<div class="muted">1 micro + 1 nano</div></td><td><div class="bar-wrap"><div class="bar bar-mn" style="width:46%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>September</strong></td><td><span class="b peak">Peak</span></td><td><strong>€1,100</strong></td><td>€375<div class="muted">3 boosts</div></td><td>€300<div class="muted">2–3 boosts</div></td><td class="changed">€425<div class="muted">2 micro + 1 nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:92%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>October</strong></td><td><span class="b peak">Peak</span></td><td><strong>€1,100</strong></td><td>€325<div class="muted">3 boosts</div></td><td>€350<div class="muted">3 boosts</div></td><td class="changed">€425<div class="muted">1 micro + endorsement + nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:92%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>November</strong></td><td><span class="b peak">Peak</span></td><td><strong>€1,100</strong></td><td>€300<div class="muted">2–3 boosts</div></td><td>€375<div class="muted">3 boosts</div></td><td class="changed">€425<div class="muted">micro + roundtable + nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:92%"></div></div></td></tr>
+      <tr class="wk-mn"><td><strong>December</strong></td><td><span class="b maint">Maintenance</span></td><td><strong>€500</strong></td><td>€200<div class="muted">1–2 boosts</div></td><td>€100<div class="muted">1 boost</div></td><td class="changed">€200<div class="muted">1 micro + gifts</div></td><td><div class="bar-wrap"><div class="bar bar-mn" style="width:42%"></div></div></td></tr>
+      <tr class="wk-mn"><td><strong>Jan W1–2</strong></td><td><span class="b maint">Maintenance</span></td><td><strong>€250</strong></td><td>€125<div class="muted">1 test boost</div></td><td>€50<div class="muted">organic</div></td><td class="changed">€75<div class="muted">1 nano only</div></td><td><div class="bar-wrap"><div class="bar bar-mn" style="width:21%"></div></div></td></tr>
+      <tr class="wk-pk"><td><strong>Jan W3–4</strong></td><td><span class="b peak">Peak</span></td><td><strong>€600</strong></td><td>€225<div class="muted">2 boosts</div></td><td>€175<div class="muted">2 boosts</div></td><td class="changed">€200<div class="muted">1 micro + 1 nano</div></td><td><div class="bar-wrap"><div class="bar bar-pk" style="width:50%"></div></div></td></tr>
+      <tr class="total-row"><td colspan="2">Total</td><td><strong>€8,050</strong></td><td>€2,800</td><td>€2,050</td><td class="changed">€3,200</td><td></td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:8px;font-size:10px;color:#888;background:#fafafa;padding:8px 10px;border-radius:6px;line-height:1.6"><strong style="color:#1C1A17">Collab rate guide:</strong> Micro (10K–100K followers) = €150–200/post · Nano (1K–10K) = €50–75/post · Newsletter cross-promo = €0 · Guest reshare gifts = €25–50 · Founder endorsement = €100–150 · Roundtable = €150</div>
+</div>
+
+<!-- PEAK MONTHS -->
+<div id="heavy" class="section">
+  <div class="section-title">Peak months detail</div>
+  <div class="insight">Collabs are now the largest budget line in peak months at €425–500/month. 2 meaningful micro-influencer collabs + 1–2 nano collabs per month. October–November add founder endorsements and the multi-founder roundtable.</div>
+
+  <div class="card pk"><div class="card-title">May <span class="tbadge peak">€1,200</span></div><div class="card-sub">Strongest month · Pre-summer surge · Maximum collab spend</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€450</div><div class="cs">4 boosts · €25/day</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€250</div><div class="cs">2 boosts · €25/day</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€500</div><div class="cs">2 micro + 2 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic + free exchanges</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">Kristy Drutman / CareerBee €150–200 · Mandy Tang / impact career nano €50–75 · 2 × newsletter exchange €0</div></div>
+
+  <div class="card pk"><div class="card-title">June <span class="tbadge peak">€1,100</span></div><div class="card-sub">Last pre-summer push · First LI boost · Strong collab month</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€400</div><div class="cs">3–4 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€250</div><div class="cs">2 boosts</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€450</div><div class="cs">2 micro + 1 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">Tiffany Uman / career growth creator €150–175 · Sustainability nano €75 · newsletter exchange €0</div></div>
+
+  <div class="card pk"><div class="card-title">September <span class="tbadge peak">€1,100</span></div><div class="card-sub">Post-summer return · LI increases · Deploy content stockpile</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€375</div><div class="cs">3 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€300</div><div class="cs">2–3 boosts</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€425</div><div class="cs">2 micro + 1 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">High-reach impact career account €150 · Burnout/career change creator €150 · Nano €75 · LI guest collab gift €50</div></div>
+
+  <div class="card pk"><div class="card-title">October <span class="tbadge peak">€1,100</span></div><div class="card-sub">Conversion phase · LI = primary sales channel · Founder endorsements begin</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€325</div><div class="cs">3 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€350</div><div class="cs">3 boosts</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€425</div><div class="cs">micro + endorsement + nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">Impact career micro €200 · Founder endorsement gift €150 · Nano €75 · Newsletter exchange €0</div></div>
+
+  <div class="card pk"><div class="card-title">November <span class="tbadge peak">€1,100</span></div><div class="card-sub">Pre-holiday urgency · Multi-founder roundtable · Highest LI spend</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€300</div><div class="cs">2–3 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€375</div><div class="cs">3 boosts</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€425</div><div class="cs">micro + roundtable + nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">High-value micro €200 · Multi-founder roundtable gift €150 · Nano €75 · Newsletter exchange €0</div></div>
+
+  <div class="card ln"><div class="card-title">January W3–4 <span class="tbadge launch">€600</span></div><div class="card-sub">New year surge · 2-week burst · Career change hook collab</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€225</div><div class="cs">2 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€175</div><div class="cs">2 boosts</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€200</div><div class="cs">1 micro + 1 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">New year career change creator €150 · Nano €50 · Final collab of the 9 months</div></div>
+</div>
+
+<!-- MAINTENANCE MONTHS -->
+<div id="maint" class="section">
+  <div class="section-title">Maintenance months — collabs never go to zero</div>
+  <div class="insight">Organic posting continues at full pace in all maintenance months — only paid spend reduces. July and August are content production months. Arrive at September with 8 reels ready to deploy.</div>
+
+  <div class="card mn"><div class="card-title">July <span class="tbadge maint">€550</span></div><div class="card-sub">Summer slowdown · Content production month · 1 micro + 1 nano</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€200</div><div class="cs">2 boosts · €25/day</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€100</div><div class="cs">organic only</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€250</div><div class="cs">1 micro + 1 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">1 × sustainability professional micro €150 · 1 × nano €75 · newsletter exchange free · Batch-create Sept content</div></div>
+
+  <div class="card mn"><div class="card-title">August <span class="tbadge maint">€550</span></div><div class="card-sub">Lowest engagement month · Pre-September warm-up collab</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€200</div><div class="cs">2 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€100</div><div class="cs">organic only</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€250</div><div class="cs">1 micro + 1 nano</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">1 × career change creator €150 · 1 × nano pre-Sept warm-up €75 · Optimise SEO pages · Film interviews</div></div>
+
+  <div class="card mn"><div class="card-title">December <span class="tbadge maint">€500</span></div><div class="card-sub">Holiday period · Year-end gifts · Talent collab only</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€200</div><div class="cs">1–2 boosts</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€100</div><div class="cs">1 boost</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€200</div><div class="cs">1 micro + gifts</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">1 × year-end purpose collab €150 · Guest reshare gifts €50 · Personal DMs to all podcast guests · Prepare January</div></div>
+
+  <div class="card mn"><div class="card-title">January W1–2 <span class="tbadge maint">€250</span></div><div class="card-sub">Holiday tail · Hold budget for W3–4 surge</div><div class="cg"><div class="ci"><div class="cn">Instagram</div><div class="ca">€125</div><div class="cs">1 test boost</div></div><div class="ci"><div class="cn">LinkedIn</div><div class="ca">€50</div><div class="cs">organic only</div></div><div class="ci"><div class="cn" style="color:#0F6E56">Collabs</div><div class="ca changed">€75</div><div class="cs">1 nano only</div></div><div class="ci"><div class="cn">Substack</div><div class="ca">€0</div><div class="cs">organic only</div></div></div><div class="muted" style="margin-top:6px;border-left:2px solid #eee;padding-left:6px">1 × nano new year warm-up €75 · Hold budget for Jan W3–4 · New year message to all guests</div></div>
+</div>
+
+<!-- CHANNEL BREAKDOWN -->
+<div id="channels" class="section">
+  <div class="section-title">Channel breakdown — final v3 · 4 channels · €8,100 total</div>
+  <div class="insight">Collabs now the largest channel at 39% — overtaking Instagram (35%). Substack = €0 paid. Promoted organically via IG Story boosts (inside Instagram budget) and free newsletter exchanges.</div>
+  <table>
+    <thead><tr><th>Channel</th><th>Peak/mo</th><th>Maintenance/mo</th><th>9-mo total</th><th>%</th><th>What it pays for</th></tr></thead>
+    <tbody>
+      <tr><td><span class="b ig">Instagram</span></td><td>€375–450</td><td>€200</td><td><strong>€2,800</strong></td><td>35%</td><td>€25/day boosts · Ads Manager only · Profile visits objective · 2–4 boosts/month by season</td></tr>
+      <tr><td><span class="b co">Collabs</span></td><td class="changed">€425–500</td><td class="changed">€200–250</td><td class="changed"><strong>€3,200</strong></td><td class="changed">39%</td><td>2 micro (€150–200) + 1–2 nano (€50–75) peak · 1 micro + 1 nano maintenance · Roundtable + endorsements P3</td></tr>
+      <tr><td><span class="b li">LinkedIn</span></td><td>€250–375</td><td>€100</td><td><strong>€2,050</strong></td><td>25%</td><td>€25/day boosts · Doc carousel format · 2–3 boosts peak · 1 maintenance · 0 in summer</td></tr>
+      <tr><td>Substack</td><td>€0</td><td>€0</td><td><strong>€0</strong></td><td>0%</td><td>Organic only. IG Story boosts inside Instagram budget. Free newsletter exchanges throughout.</td></tr>
+      <tr class="total-row"><td colspan="3">Total</td><td><strong>€8,050</strong></td><td>~100%</td><td>€50 buffer — allocate to best November collab</td></tr>
+    </tbody>
+  </table>
+  <div class="grp" style="margin-top:14px">Collab rate card</div>
+  <table>
+    <thead><tr><th>Type</th><th>Example accounts</th><th>Followers</th><th>Rate</th><th>Best used for</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Micro-influencer</strong></td><td>Kristy Drutman · CareerBee · Mandy Tang</td><td>50K–110K</td><td class="changed">€150–200</td><td>Main reach driver · 1–2 per month peak · high audience overlap</td></tr>
+      <tr><td><strong>Nano influencer</strong></td><td>Impact career creators · ESG day-in-life</td><td>5K–20K</td><td class="changed">€50–75</td><td>Supplement micro · 10–15% engagement rate · often open to exchange</td></tr>
+      <tr><td><strong>Newsletter exchange</strong></td><td>Future of Work · ESG investing newsletters</td><td>1K–15K subs</td><td>€0</td><td>Free mutual mention · most cost-effective subscriber acquisition</td></tr>
+      <tr><td><strong>Guest reshare gift</strong></td><td>All podcast episode guests</td><td>Varies</td><td>€25–50</td><td>Small gift to encourage reshare · applied all phases · high trust reach</td></tr>
+      <tr><td><strong>Founder endorsement</strong></td><td>B Corp leaders · Impact investors</td><td>3K–20K LI</td><td>€100–150</td><td>P3 only · gift + time · converts founder audience to recruiting leads</td></tr>
+      <tr><td><strong>Roundtable collab</strong></td><td>3–4 podcast guests · co-authored LI post</td><td>Combined</td><td>€150</td><td>November only · highest single-piece reach · time is the real investment</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CALENDAR APR–JUN -->
+<div id="cal1" class="section">
+  <div class="section-title">Calendar — April 27 to June 30 · Launch + Spring Peak</div>
+  <div class="insight">Launch week: IG boost only · €100 · No collabs yet. May and June: maximum collab activity — 2 micro + 1–2 nano per month. Substack promoted via free newsletter exchanges and IG Story boosts inside the Instagram budget.</div>
+  <table>
+    <thead><tr><th>Week</th><th>Type</th><th>€</th><th><span class="b ig">Instagram</span></th><th><span class="b li">LinkedIn</span></th><th><span class="b co">Collabs</span></th><th><span class="b em">Email/SEO</span></th></tr></thead>
+    <tbody>
+      <tr class="wk-pk"><td><strong>W1 Apr 27</strong></td><td><span class="b launch">Launch</span></td><td>€100</td><td>2 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> After 48h · €100 · 4 days · €25/day</div></td><td>Organic only<div class="muted">Claudia + Laia · setup week</div></td><td class="changed">€0 — setup only<div class="muted">Reach out to Kristy Drutman · setup collab templates</div></td><td>Email landing page live · keyword research</td></tr>
+      <tr class="wk-pk"><td><strong>W2 May 4</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Best post · €175 · 7 days · €25/day</div></td><td>Doc carousel<div class="muted">Most in-demand impact roles 2026</div></td><td class="changed">Micro collab 1 · €150–200<div class="muted">Kristy Drutman / career change account · IG Reel</div></td><td>SEO page 1 draft · "Impact jobs Europe"</td></tr>
+      <tr class="wk-pk"><td><strong>W3 May 11</strong></td><td><span class="b peak">Peak</span></td><td>€225</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Talent pool CTA · €175 · 7 days</div></td><td>Text post<div class="muted">Laia: "Why founders can't find mission-driven talent"</div></td><td class="changed">Nano collab 1 · €50–75<div class="muted">Impact career nano account · IG Reel or story</div></td><td>Email welcome sequence live</td></tr>
+      <tr class="wk-pk"><td><strong>W4 May 18</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Shock data reel · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> First LI · €150<div class="muted">Impact roles doc · founders · €25/day × 6</div></td><td class="changed">Micro collab 2 · €150–175<div class="muted">Laura from CareerBee · TikTok + IG</div></td><td>SEO page 1 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W5 May 25</strong></td><td><span class="b peak">Peak</span></td><td>€250</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Best May post · €175 · 7 days</div></td><td>2 organic posts<div class="muted">Claudia: founder POV · purpose vs profit</div></td><td class="changed">Nano collab 2 · €50–75<div class="muted">Sustainability professional · "day in the life" format</div></td><td>SEO page 2 draft</td></tr>
+      <tr class="wk-pk"><td><strong>W6 Jun 1</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Top reel · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">"Why you're not attracting mission-driven talent"</div></td><td class="changed">Micro collab 3 · €150<div class="muted">Mandy Tang / "should I quit" angle · IG + TT</div></td><td>SEO page 2 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W7 Jun 8</strong></td><td><span class="b peak">Peak</span></td><td>€175</td><td>3 Reels + 1 Carousel<div class="muted">Myth-breaking · belief system · company spotlight</div></td><td>Text post<div class="muted">Laia: green skills stat · provoke discussion</div></td><td class="changed">Newsletter exchange · €0<div class="muted">First cross-promo with impact career newsletter</div></td><td>Email digest launched</td></tr>
+      <tr class="wk-pk"><td><strong>W8 Jun 15</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Best June post · €175 · 7 days</div></td><td>Doc carousel<div class="muted">Claudia: "What I've learned from 20 impact founders"</div></td><td class="changed">Nano collab 3 · €75<div class="muted">ESG/climate career account · burnout angle</div></td><td>SEO page 3 draft</td></tr>
+      <tr class="wk-pk"><td><strong>W9 Jun 22</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Talent pool CTA · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">Hiring pain doc carousel · founders</div></td><td class="changed">Micro collab 4 · €150<div class="muted">Tiffany Uman / career growth impact creator</div></td><td>SEO page 3 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W10 Jun 29</strong></td><td><span class="b peak">Peak</span></td><td>€0</td><td>2 Reels + 2 Carousels<div class="muted">Pre-summer · evergreen content</div></td><td>2 organic posts</td><td class="changed">Guest clips batch · €0<div class="muted">Formatted clips to all May/June guests · reshare push</div></td><td>P1 metrics review</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CALENDAR JUL–SEP -->
+<div id="cal2" class="section">
+  <div class="section-title">Calendar — July to September · Maintenance then Autumn Peak</div>
+  <div class="insight">July–August: 1 micro + 1 nano collab per month. Keeps the audience relationship warm. Use July and August to batch-produce 8 reels for September. Arrive at the autumn peak fully loaded.</div>
+  <table>
+    <thead><tr><th>Week</th><th>Type</th><th>€</th><th><span class="b ig">Instagram</span></th><th><span class="b li">LinkedIn</span></th><th><span class="b co">Collabs</span></th><th><span class="b em">Email/SEO</span></th></tr></thead>
+    <tbody>
+      <tr class="wk-mn"><td><strong>W11 Jul 6</strong></td><td><span class="b maint">Maint.</span></td><td>€200</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Best post · €125 · 5 days · €25/day</div></td><td>1 organic post</td><td class="changed">Micro collab 5 · €150<div class="muted">Sustainability professional · summer organic-style content</div></td><td>Batch film Sept reels</td></tr>
+      <tr class="wk-mn"><td><strong>W12 Jul 13</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>3 Reels + 1 Carousel<div class="muted">Evergreen · no boost this week</div></td><td>1 organic post</td><td class="changed">Newsletter exchange · €0<div class="muted">Second cross-promo · future of work newsletter</div></td><td>SEO page 4 draft</td></tr>
+      <tr class="wk-mn"><td><strong>W13 Jul 20</strong></td><td><span class="b maint">Maint.</span></td><td>€200</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Top July post · €125 · 5 days</div></td><td>2 organic posts</td><td class="changed">Nano collab 4 · €75<div class="muted">Impact career nano · summer audience still browsing</div></td><td>SEO page 4 publish</td></tr>
+      <tr class="wk-mn"><td><strong>W14 Jul 27</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>2 Reels + 1 Carousel<div class="muted">Reduced · mid-summer · evergreen only</div></td><td>1 organic post</td><td class="changed">Guest clips batch · €0<div class="muted">Follow up reshares from June guests</div></td><td>Film 3–4 more Sept reels</td></tr>
+      <tr class="wk-mn"><td><strong>W15 Aug 3</strong></td><td><span class="b maint">Maint.</span></td><td>€200</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Best Aug post · €125 · 5 days</div></td><td>1 organic post</td><td class="changed">Micro collab 6 · €150<div class="muted">Career change creator · pre-September warm-up tone</div></td><td>Optimise SEO pages</td></tr>
+      <tr class="wk-mn"><td><strong>W16 Aug 10</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>3 Reels + 1 Carousel<div class="muted">Evergreen career change content</div></td><td>1 organic post</td><td class="changed">Newsletter exchange · €0<div class="muted">Third cross-promo · ESG careers newsletter</div></td><td>SEO page 5 draft</td></tr>
+      <tr class="wk-mn"><td><strong>W17 Aug 17</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>2 Reels + 2 Carousels<div class="muted">Reduced · late August</div></td><td>1 organic post</td><td class="changed">Nano collab 5 · €75<div class="muted">Pre-September warm-up · IG Reel · career change hook</div></td><td>Final Sept batch ready · 8 reels total</td></tr>
+      <tr class="wk-mn"><td><strong>W18 Aug 24</strong></td><td><span class="b maint">Maint.</span></td><td>€125</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Pre-Sept warm-up · €125 · 5 days</div></td><td>2 organic posts<div class="muted">Laia: "what we're launching in September"</div></td><td class="changed">Guest clips batch · €0<div class="muted">Send Sept episode clips to all recent guests</div></td><td>SEO page 5 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W19 Sep 1</strong></td><td><span class="b peak">Peak</span></td><td>€425</td><td>4 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Autumn launch · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">Talent pool proof · "1,500 professionals"</div></td><td class="changed">Micro collab 7 · €150<div class="muted">Highest-reach account of Q3 · deploy content stockpile</div></td><td>Direct outreach: 10 guests</td></tr>
+      <tr class="wk-pk"><td><strong>W20 Sep 8</strong></td><td><span class="b peak">Peak</span></td><td>€250</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Company spotlight · €175 · 7 days</div></td><td>Doc carousel<div class="muted">"5 things impact founders wish they knew about hiring"</div></td><td class="changed">Nano collab 6 · €75<div class="muted">Career change creator · autumn energy</div></td><td>Email digest · jobs + spotlight</td></tr>
+      <tr class="wk-pk"><td><strong>W21 Sep 15</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Shock data reel · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">Recruiting service positioning post</div></td><td class="changed">Micro collab 8 · €150<div class="muted">Co-authored LI post with podcast guest · €50 gift</div></td><td>SEO page 6 draft</td></tr>
+      <tr class="wk-pk"><td><strong>W22 Sep 22</strong></td><td><span class="b peak">Peak</span></td><td>€175</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Talent pool CTA · €175 · 7 days</div></td><td>2 organic posts<div class="muted">Claudia: "what I've stopped believing about impact careers"</div></td><td class="changed">Newsletter exchange · €0<div class="muted">Fourth cross-promo · impact investing newsletter</div></td><td>SEO page 6 publish</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CALENDAR OCT–JAN -->
+<div id="cal3" class="section">
+  <div class="section-title">Calendar — October to January 2027 · Convert + Year-end</div>
+  <div class="insight">October–November: founder endorsements and roundtable collabs enter the plan. December: 1 micro only. January W1–2: hold budget. January W3–4: final career change collab timed to the new year surge — biggest organic opportunity of the 9 months.</div>
+  <table>
+    <thead><tr><th>Week</th><th>Type</th><th>€</th><th><span class="b ig">Instagram</span></th><th><span class="b li">LinkedIn</span></th><th><span class="b co">Collabs</span></th><th><span class="b em">Email/SEO</span></th></tr></thead>
+    <tbody>
+      <tr class="wk-pk"><td><strong>W23 Sep 29</strong></td><td><span class="b peak">Peak</span></td><td>€175</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Top Sept post · €175 · 7 days</div></td><td>Doc carousel<div class="muted">"RC 6-month update — talent pool"</div></td><td class="changed">Guest reshare push · €0<div class="muted">Follow up all Sept episode guests · formatted clips sent</div></td><td>SEO audit · P1 rankings</td></tr>
+      <tr class="wk-pk"><td><strong>W24 Oct 6</strong></td><td><span class="b peak">Peak</span></td><td>€425</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Talent pool CTA · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">Recruiting service launch post · €25/day × 6</div></td><td class="changed">Micro collab 9 · €200<div class="muted">High-reach impact career account · conversion-focused</div></td><td>Email: 2,000 members milestone</td></tr>
+      <tr class="wk-pk"><td><strong>W25 Oct 13</strong></td><td><span class="b peak">Peak</span></td><td>€250</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Belief system reel · €175 · 7 days</div></td><td>2 organic posts<div class="muted">Case study if available · founder pain post</div></td><td class="changed">Nano collab 7 · €75<div class="muted">ESG career nano · conversion-angle content</div></td><td>SEO page 7 draft</td></tr>
+      <tr class="wk-pk"><td><strong>W26 Oct 20</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 2 Carousels<div class="muted">Job + meaning · company hiring spotlight</div></td><td><span class="b boost">BOOST</span> LI · €150<div class="muted">"We helped X hire" case study · if available</div></td><td class="changed">Founder endorsement · €150<div class="muted">Podcast guest gift · endorses RC recruiting service on LI</div></td><td>SEO page 7 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W27 Oct 27</strong></td><td><span class="b peak">Peak</span></td><td>€175</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Top Oct post · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €175<div class="muted">"Hiring mission-driven talent in 2027" · 7 days</div></td><td class="changed">Newsletter exchange · €0<div class="muted">Fifth cross-promo · ESG investing newsletter</div></td><td>Direct outreach: 15 guests</td></tr>
+      <tr class="wk-pk"><td><strong>W28 Nov 3</strong></td><td><span class="b peak">Peak</span></td><td>€375</td><td>3 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> Talent pool CTA · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €175<div class="muted">"Companies winning talent in 2027"</div></td><td class="changed">Micro collab 10 · €200<div class="muted">Highest-value account of Q4 · pre-holiday urgency angle</div></td><td>SEO page 8 draft</td></tr>
+      <tr class="wk-pk"><td><strong>W29 Nov 10</strong></td><td><span class="b peak">Peak</span></td><td>€325</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Founder endorsement clip · €175 · 7 days</div></td><td>2 organic posts<div class="muted">Laia: "the talent problem no impact founder talks about"</div></td><td class="changed">Roundtable collab · €150<div class="muted">3–4 podcast guests · "what makes great impact talent" · LI doc</div></td><td>SEO page 8 publish</td></tr>
+      <tr class="wk-pk"><td><strong>W30 Nov 17</strong></td><td><span class="b peak">Peak</span></td><td>€250</td><td>3 Reels + 2 Carousels<div class="muted">Myth-breaking · shock data · talent CTA</div></td><td><span class="b boost">BOOST</span> LI · €175<div class="muted">Final Nov recruiting push · book a call CTA</div></td><td class="changed">Nano collab 8 · €75<div class="muted">Pre-holiday urgency · "jobs worth switching for"</div></td><td>Email: year-end job roundup</td></tr>
+      <tr class="wk-mn"><td><strong>W31 Nov 24</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>2 Reels + 1 Carousel<div class="muted">Pre-holiday · evergreen</div></td><td>1 organic post</td><td class="changed">Newsletter exchange · €0<div class="muted">Sixth cross-promo · year-end impact careers digest</div></td><td>Write all Jan W3–4 content now</td></tr>
+      <tr class="wk-mn"><td><strong>W32 Dec 1</strong></td><td><span class="b maint">Maint.</span></td><td>€200</td><td>2 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> Year-end purpose · €125 · 5 days</div></td><td>1 organic post</td><td class="changed">Micro collab 11 · €150<div class="muted">Year-end purpose content · career change angle</div></td><td>SEO review · update 2026 stats</td></tr>
+      <tr class="wk-mn"><td><strong>W33 Dec 8</strong></td><td><span class="b maint">Maint.</span></td><td>€150</td><td>2 Reels + 2 Carousels<div class="muted">Holiday season · warm content</div></td><td><span class="b boost">BOOST</span> LI · €125<div class="muted">"Hiring in 2027?" · 5 days · €25/day</div></td><td class="changed">Guest reshare gifts · €50<div class="muted">Year-end gift to top guest collaborators</div></td><td>Personal DMs to all guests</td></tr>
+      <tr class="wk-mn"><td><strong>W34 Dec 15</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>2 Reels<div class="muted">Holiday reduced · evergreen only</div></td><td>1 organic post</td><td class="changed">Newsletter exchange · €0<div class="muted">Final cross-promo of 2026</div></td><td>All Jan content finalised</td></tr>
+      <tr class="wk-mn"><td><strong>W35 Dec 22</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td colspan="4" style="color:#888;font-style:italic;text-align:center">Holiday break — no posting. Rest. Resume January 5th.</td></tr>
+      <tr class="wk-mn"><td><strong>W36 Jan 5</strong></td><td><span class="b maint">Maint.</span></td><td>€0</td><td>2 Reels + 1 Carousel<div class="muted">Organic only · people returning slowly</div></td><td>1 organic post</td><td class="changed">Guest clips batch · €0<div class="muted">New year message to all guests</div></td><td>Hold budget for W3–4 surge</td></tr>
+      <tr class="wk-mn"><td><strong>W37 Jan 12</strong></td><td><span class="b maint">Maint.</span></td><td>€125</td><td>3 Reels + 1 Carousel<div class="muted"><span class="b boost">BOOST</span> First Jan test boost · €125 · 5 days</div></td><td>1 organic post</td><td class="changed">Nano collab 9 · €75<div class="muted">New year career change nano · warm audience up</div></td><td>Email: new year talent pool push</td></tr>
+      <tr class="wk-pk"><td><strong>W38 Jan 19</strong></td><td><span class="b peak">Peak</span></td><td>€500</td><td>4 Reels + 2 Carousels<div class="muted"><span class="b boost">BOOST</span> New year career change · €175 · 7 days</div></td><td><span class="b boost">BOOST</span> LI · €175<div class="muted">"Hiring in 2027" · 7 days · peak B2B week</div></td><td class="changed">Micro collab 12 · €150<div class="muted">Final collab · new year career change hook</div></td><td>Deploy all Jan content</td></tr>
+      <tr class="wk-pk"><td><strong>W39 Jan 26</strong></td><td><span class="b peak">Peak</span></td><td>€0</td><td>3 Reels + 2 Carousels<div class="muted">Organic · talent pool CTA</div></td><td>2 organic posts<div class="muted">Claudia + Laia: "what we built and what's next"</div></td><td class="changed">Newsletter exchange · €0<div class="muted">Final cross-promo · close the 9 months</div></td><td>Full 9-month review · all KPIs</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+function show(btn, id) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
